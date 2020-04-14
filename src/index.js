@@ -28,7 +28,7 @@ function App() {
       <ambientLight />
       <pointLight position={[150, 150, 150]} intensity={0.55} />
       <Cube position={[0, 0, 0]} />
-      <Particles count={10000} mouse={mouse} />
+      <Particles count={5000} mouse={mouse} />
       <Effects />
     </Canvas>
   );

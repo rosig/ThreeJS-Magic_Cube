@@ -2,9 +2,6 @@ import React, { useRef, useState, useEffect, useMemo } from "react";
 import { useFrame } from "react-three-fiber";
 import * as THREE from "three";
 
-const object = new THREE.Object3D();
-const _color = new THREE.Color();
-
 // cinza, azul, verde, amarelo, vermelho, laranja
 const _colors = [
   "#757575",
@@ -19,7 +16,10 @@ const Cube = (props) => {
   const [hovered, set] = useState();
   const previous = useRef();
   const attrib = useRef();
-  const ref = useRef();
+  const mesh = useRef();
+
+  const object = useMemo(() => new THREE.Object3D(), []);
+  const _color = useMemo(() => new THREE.Color(), []);
 
   useEffect(() => void (previous.current = hovered), [hovered]);
 
@@ -38,10 +38,10 @@ const Cube = (props) => {
       _color.toArray(color, i * 3);
     }
     return color;
-  }, [colors]);
+  }, [colors, _color]);
 
   useFrame((state) => {
-    ref.current.rotation.x = ref.current.rotation.y += 0.01;
+    mesh.current.rotation.x = mesh.current.rotation.y += 0.01;
 
     let i = 0;
     for (let x = 0; x < 3; x++)
@@ -50,7 +50,7 @@ const Cube = (props) => {
           const id = i++;
           object.position.set(x, y, z);
           object.updateMatrix();
-          ref.current.setMatrixAt(id, object.matrix);
+          mesh.current.setMatrixAt(id, object.matrix);
 
           if (hovered !== previous.current) {
             _color.set(id === hovered ? "white" : colors[id]);
@@ -58,12 +58,12 @@ const Cube = (props) => {
             attrib.current.needsUpdate = true;
           }
         }
-    ref.current.instanceMatrix.needsUpdate = true;
+    mesh.current.instanceMatrix.needsUpdate = true;
   });
 
   return (
     <instancedMesh
-      ref={ref}
+      ref={mesh}
       args={[null, null, 1000]}
       scale={[1.5, 1.5, 1.5]}
       onPointerMove={(e) => set(e.instanceId)}

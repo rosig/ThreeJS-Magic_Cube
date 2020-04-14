@@ -1,17 +1,37 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import * as THREE from "three";
+import ReactDOM from "react-dom";
+import React, { useRef, useCallback } from "react";
+import { Canvas } from "react-three-fiber";
+import Effects from "./components/Effects";
+import "./index.css";
+import Particles from "./components/Particles";
+import Cube from "./components/Cube";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+function App() {
+  const mouse = useRef([0, 0]);
+  const onMouseMove = useCallback(
+    ({ clientX: x, clientY: y }) =>
+      (mouse.current = [x - window.innerWidth / 2, y - window.innerHeight / 2]),
+    []
+  );
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+  return (
+    <Canvas
+      gl={{ antialias: false, alpha: false }}
+      camera={{ position: [0, 0, 15], near: 5, far: 20 }}
+      onCreated={({ gl }) => {
+        gl.toneMapping = THREE.Uncharted2ToneMapping;
+        gl.setClearColor(new THREE.Color("#020207"));
+      }}
+      onMouseMove={onMouseMove}
+    >
+      <ambientLight />
+      <pointLight position={[150, 150, 150]} intensity={0.55} />
+      <Cube position={[0, 0, 0]} />
+      <Particles count={10000} mouse={mouse} />
+      <Effects />
+    </Canvas>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById("root"));
